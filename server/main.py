@@ -8,13 +8,12 @@ import time
 #     print('lol')
 app = FastAPI()
 
-client = mqtt.Client("SmartIntersection")
+client = mqtt.Client()
 
-connection = client.connect("localhost",1883,60)
+connection = client.connect("broker",1883,60)
 if connection != 0:
     print("Could not connect to MQTT Broker!")
     sys.exit(-1)
-else: print("Connected to broker")
 
 
 @app.get("/api/{message}")
