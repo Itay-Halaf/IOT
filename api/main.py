@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 import uvicorn
+from DB import fire as db
 # import json
 
 app = FastAPI()
@@ -8,47 +9,68 @@ app = FastAPI()
 class TrafficLight(BaseModel):
     latitude: float
     longitude: float
-    special_number: str
-    crossroad_name: str
+    name: str
+    light: str
 
-
-traffic_lights = {}
-
-
-traffic_light_1 = TrafficLight(latitude=40.7128, longitude=-74.0060, special_number="TL001", crossroad_name="Main Street")
-traffic_light_2 = TrafficLight(latitude=34.0522, longitude=-118.2437, special_number="TL002", crossroad_name="Broadway Avenue")
-
-traffic_lights.update({traffic_light_1.special_number: traffic_light_1})
-traffic_lights.update({traffic_light_2.special_number: traffic_light_2})
+database = db
+crossroads = db.getAllCrossroads()
 
 
 
-@app.get("/traffics/", response_model= dict)
-async def get_traffic_lights():
-    return traffic_lights
+# crossroads_1 = TrafficLight(latitude=40.7128, longitude=-74.0060, special_number="TL001", crossroad_name="Main Street")
+# crossroads_2 = TrafficLight(latitude=34.0522, longitude=-118.2437, special_number="TL002", crossroad_name="Broadway Avenue")
 
-@app.get("/traffics/{traffic_id}", response_model=TrafficLight)
-async def get_traffic_light(traffic_id: str):
-    if traffic_id == None or traffic_id not in traffic_lights:
-        raise HTTPException(status_code=404, detail="Traffic light not found")
-    return traffic_lights[traffic_id]
+# crossroads.update({crossroads_1.special_number: crossroads_1})
+# crossroads.update({crossroads_2.special_number: crossroads_2})
 
-@app.post("/traffics/")
-async def postTrafficLights(traffic_light: TrafficLight):
-    traffic_lights.update({traffic_light.special_number: traffic_light})
-    req_info = traffic_light.json()
+
+
+@app.get("/crossroads/", response_model= dict)
+async def get_crossroads():
+    return crossroads
+
+@app.get("/crossroads/{crossroad_name}", response_model=dict)
+async def get_crossroad(crossroad_name: str):
+    crossroad_data = database.getCrossroadByName(crossroad_name)
+    
+    if crossroad_data is not None:
+        return crossroad_data
+    else:
+        raise HTTPException(status_code=404, detail=f"Crossroad '{crossroad_name}' not found")
+    
+
+@app.post("/crossroads/create")
+async def add_crossroad(tl: TrafficLight):
+    database.addOrUpdateCrossroad(tl)
+
+    req_info = crossroads
     return {
         "status" : "SUCCESS",
         "data" : req_info
     }
 
-@app.delete("/traffics/{traffic_id}")
-async def get_traffic_light(traffic_id: str):
-    if traffic_id in traffic_lights:
-        del traffic_lights[traffic_id]
+
+@app.post("/crossroads/update")
+async def post_crossroad(tl: dict):
+    database.addOrUpdateCrossroad(tl)
+
+    req_info = crossroads.json()
     return {
-        "status" : "DELETED",
+        "status" : "SUCCESS",
+        "data" : req_info
     }
 
-# if __name__ == "__main__":
-#     uvicorn.run(app, host="0.0.0.0", port=8002)
+@app.put("/crossroads/{tl}")
+async def change_light(tl: str):
+        return database.changeCrossroadLight(tl)
+
+
+@app.delete("/crossroads/{crossroads_name}")
+async def delete_crossroad(crossroads_name: str):
+    result = database.deleteCrossroad(crossroads_name)
+    return {
+        "status" : result,
+    }
+
+ 
+#uvicorn.run(app, host="0.0.0.0", port=8002)
