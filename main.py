@@ -1,12 +1,7 @@
-from fastapi import FastAPI
 import paho.mqtt.client as mqtt
 import sys
 import time
 
-# while True:
-#     time.sleep(11)
-#     print('lol')
-app = FastAPI()
 
 client = mqtt.Client("SmartIntersection")
 
@@ -16,8 +11,6 @@ if connection != 0:
     sys.exit(-1)
 else: print("Connected to broker")
 
-
-@app.get("/api/{message}")
 def shtok(message: str):
     print(f'sending {message}')
     client.publish("test/status", message, 0)
