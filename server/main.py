@@ -3,12 +3,12 @@ import paho.mqtt.client as mqtt
 import sys
 import time
 
-# while True:
-#     time.sleep(11)
-#     print('lol')
 app = FastAPI()
 
 client = mqtt.Client()
+
+client.on_message = lambda m: print(f'Message received: {m}')
+
 
 connection = client.connect("broker",1883,60)
 if connection != 0:

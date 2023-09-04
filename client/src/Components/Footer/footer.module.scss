@@ -1,0 +1,23 @@
+.footerContainer {
+    padding: 30px;
+    border: 1px solid #63636340;
+    box-shadow: -5px 4px 10px rgb(28 28 28);
+    background-color: #3f3f3f20;
+    width: calc(100% - 7px);
+    left: 0;
+    bottom: 0;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    position: fixed;
+    color: white;
+    backdrop-filter: blur(8px);
+    z-index: 99;
+}
+
+.footerLogo {
+    font-size: small;
+    display: flex;
+    align-items: center;
+    height: 100%;
+}

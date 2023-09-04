@@ -1,0 +1,54 @@
+.App {
+  text-align: center;
+  overflow: hidden;
+  min-height: 100vh;
+  max-height: 100vh;
+}
+
+.App-body {
+  height: 100vh;
+  width: 100%;
+  background-color: #282c34;
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: calc(10px + 1vmin);
+  color: white;
+}
+
+* {
+  &::-webkit-scrollbar {
+    border-radius: 7px;
+    height: 7px;
+    width: 7px;
+    background-color: steelblue;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 7px;
+    background-color: steelblue;
+  }
+
+  &::-webkit-scrollbar-track {
+    border-radius: 7px;
+    background-color: slategray;
+  }
+}
+
+.container {
+  display: flex;
+  width: calc(100% - 28px);
+  padding: 10px;
+  color: slategray;
+}
+
+.header-block {
+  flex: 0 0 100px;
+  height: 100px;
+  width: 100%;
+}
+
+.intersections {
+  height: 300px;
+}

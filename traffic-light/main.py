@@ -1,29 +1,26 @@
 from fastapi import FastAPI
 import paho.mqtt.client as mqtt
 import sys
+from contextlib import asynccontextmanager
 import time
 import logging
 import asyncio as ai
 
-async def on_message(client,userdata,message):
+def on_message(client,userdata,message):
     print("Message recieved: " + str(message.payload.decode("utf-8")))
     print('Topic: ' + str(message.topic))
     logging.log(logging.INFO, message)
-    await ai.as_completed()
 
-print('test')
-client = mqtt.Client()
 
-async def sub():
+def sub():
+    client = mqtt.Client()
     try:
-        logging.log(logging.INFO, "Starting subscriber!! ahhhh!!!")
-
         topic = "test/status"
 
         client.subscribe(topic)
         client.loop_start()
 
-        client.on_message = await ai.coroutine(on_message) #lambda client, userdata, message:print(message)
+        client.on_message = (on_message) #lambda client, userdata, message:print(message)
 
         logging.log(logging.INFO, "Subscriber has been started successfully..")
         connection = client.connect("broker",1883,60)
@@ -39,13 +36,20 @@ async def sub():
 
     client.disconnect()
 
-def main():
-    sub()
+# sub()
 
-app = FastAPI()
+async def test_method():
+    while True:
+        print('Thread is running..')
+        await ai.sleep(2)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    ai.create_task(test_method())
+    yield
+    
+app = FastAPI(lifespan=lifespan)
 
 @app.get("/api/{message}")
 def shtok(message: str):
-    # await ai.coroutine(client.publish("test/status", message, 0))
-    client.publish("test/status", message, 0)
     return {"Something": "New"}
