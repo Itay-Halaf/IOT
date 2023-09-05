@@ -1,11 +1,13 @@
-*/mqtt_init.py
-*/serviceAccountKey.json
-client/node_modules
-yuri
+# Ignore specific files
+mqtt_init.py
+serviceAccountKey.json
 broker.ipynb
+./main.py
+./broker.py
+
+# Ignore directories and their contents
+client/node_modules/
 car/
 server/
 traffic-light/
-main.py
 test/
-server/
