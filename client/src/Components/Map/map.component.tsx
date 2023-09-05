@@ -19,6 +19,7 @@ import { IntersectionMarker } from "./IntersectionMarker/intersectionMarker.comp
 import { Ref, useEffect, useRef, useState } from "react";
 import "leaflet-routing-machine";
 import { Button } from "../Controls/Button/button.component";
+import { socketService } from "../../Services/socket.service";
 
 const LeafMap = (props: MapProperties) => {
   const marks = props.children.map((m) => (
@@ -54,6 +55,11 @@ const LeafMap = (props: MapProperties) => {
 
   const subStepsNumber = 1850 * 100;
   const subStep = 1 / subStepsNumber;
+
+  useEffect(() => {
+    socketService.connect = () => alert("connected");
+    socketService.onMessage = e => console.log(e);
+  }, []);
 
   useEffect(() => {
     if (

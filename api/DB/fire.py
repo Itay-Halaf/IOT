@@ -35,30 +35,7 @@ crossroads_ref = ref.child('Crossroads')
 cars_ref = ref.child('cars')
 broker_ref = ref.child('broker')
 
-
-crossroads_ref.set({
-        "Main Street and Elm Avenue":{
-        "latitude": 37.12345,
-        "longitude": -122.67890,
-        "light": "Green"
-        }
-})
-cars_ref.set({
-    "car_id_1": {
-        "model": "ferrari",
-        "location":"somewhere",
-        "speed":"100 KPH",
-    }
-})
-
-broker_ref.set({
-
-})
-
-
 crossroads_data = crossroads_ref.get()
-
-
 
 def getAllCrossroads():
     return crossroads_ref.get()
