@@ -12,6 +12,7 @@ class TrafficLight(BaseModel):
     longitude: float
     name: str
     light: str
+    cases: int
 
 database = db
 crossroads = db.getAllCrossroads()
@@ -53,8 +54,12 @@ async def post_crossroad(tl: dict):
 
 @app.put("/crossroads/{tl}")
 async def change_light(tl: str):
+        database.addCaseNumber(tl)
         return database.changeCrossroadLight(tl)
 
+@app.put("/crossroads/cases/{tl}")
+async def add_case(tl: str):
+        return database.addCaseNumber(tl)
 
 @app.delete("/crossroads/{crossroads_name}")
 async def delete_crossroad(crossroads_name: str):

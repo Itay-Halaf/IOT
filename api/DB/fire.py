@@ -1,3 +1,4 @@
+import json
 import firebase_admin
 from firebase_admin import credentials, db
 from pydantic import BaseModel
@@ -42,7 +43,8 @@ broker_ref = ref.child('broker')
 #         "Main Street and Elm Avenue":{
 #         "latitude": 37.12345,
 #         "longitude": -122.67890,
-#         "light": "Green"
+#         "light": "Green",
+#         "cases": 0
 #         }
 # })
 # cars_ref.set({
@@ -93,6 +95,16 @@ def changeCrossroadLight(tl):
     except Exception as e:
         print("Error updating data in Firebase:", str(e))
         raise e
+    
+def addCaseNumber(tl):
+    try:
+        current_case_number = crossroads_ref.child(tl).get().get("cases") + 1
+        crossroads_ref.child(tl).update({"cases": current_case_number})
+        return {"status": "SUCCESS", tl : crossroads_ref.child(tl).get()}
+    except Exception as e:
+        print("Error updating data in Firebase:", str(e))
+        raise e
+
 
 
 def updateCrossroad(tl):
@@ -120,11 +132,14 @@ def deleteCrossroad(crossroad_name):
 
 def addOrUpdateCrossroad(tl):
 
+    print(tl.cases)
+
     crossroad_name = tl.name
     tl_dict = tl.dict()
     tl_dict.pop('name')
     tl_dict = {crossroad_name: tl_dict}
     crossroads_ref.update(tl_dict)
+
 
 
 def updateBrokerDB(topic, message):
