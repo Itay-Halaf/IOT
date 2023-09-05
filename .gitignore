@@ -3,3 +3,9 @@
 client/node_modules
 yuri
 broker.ipynb
+car/
+server/
+traffic-light/
+main.py
+test/
+server/
