@@ -11,7 +11,7 @@ apilink = "localhost"
 portnum = "8002"
 url = f"http://{apilink}:{portnum}/"
 
-crossroad_name = ""
+crossroad_name = "TrafficLight"
 
 color_dict = {"Red": Qt.red, "Green": Qt.green}
 
