@@ -1,6 +1,8 @@
 import firebase_admin
 from firebase_admin import credentials, db
 from pydantic import BaseModel
+from datetime import datetime
+
 
 class TrafficLight(BaseModel):
     latitude: float
@@ -24,7 +26,7 @@ def db_connect():
 
         })
 
-        print("Data has been written to the Firebase Realtime Database.")
+        print("Firebase Realtime Database.")
         return app
     except Exception as e:
         print("Error:", e)
@@ -35,7 +37,36 @@ crossroads_ref = ref.child('Crossroads')
 cars_ref = ref.child('cars')
 broker_ref = ref.child('broker')
 
+
+# crossroads_ref.set({
+#         "Main Street and Elm Avenue":{
+#         "latitude": 37.12345,
+#         "longitude": -122.67890,
+#         "light": "Green"
+#         }
+# })
+# cars_ref.set({
+#     "car_id_1": {
+#         "model": "ferrari",
+#         "location":"somewhere",
+#         "speed":"100 KPH",
+#     }
+# })
+
+# broker_ref.set({
+#     "topic_name": {
+#         "message": "content",
+#         "time": datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+#     },
+#     "new_topic_name": {
+#         "message_number": "content",
+#     },
+# })
+
+
 crossroads_data = crossroads_ref.get()
+
+
 
 def getAllCrossroads():
     return crossroads_ref.get()
@@ -64,9 +95,6 @@ def changeCrossroadLight(tl):
         raise e
 
 
-
-
-
 def updateCrossroad(tl):
     crossroad_name = tl.name
     if crossroad_name in crossroads_data:
@@ -80,8 +108,6 @@ def updateCrossroad(tl):
         return f"Crossroad '{crossroad_name}' not found in the data."
 
 
-
-
 def deleteCrossroad(crossroad_name):
     crossroad_ref = crossroads_ref.child(crossroad_name)
 
@@ -90,7 +116,6 @@ def deleteCrossroad(crossroad_name):
         return f"Crossroad '{crossroad_name}' has been deleted."
     else:
         return f"Crossroad '{crossroad_name}' not found in the data."
-    
 
 
 def addOrUpdateCrossroad(tl):
@@ -100,3 +125,22 @@ def addOrUpdateCrossroad(tl):
     tl_dict.pop('name')
     tl_dict = {crossroad_name: tl_dict}
     crossroads_ref.update(tl_dict)
+
+
+def updateBrokerDB(topic, message):
+    msg = {"message": message, "time": datetime.now().strftime("%d/%m/%Y %H:%M:%S")}
+    topic_ref = broker_ref.child(topic)
+
+    topic_dict = topic_ref.get()
+    if topic_dict and "messages" in topic_dict:
+        messages = topic_dict["messages"]
+        messages.insert(0, msg)
+    else:
+        messages = [msg]
+
+    topic_dict = {
+        topic:{
+        "messages": messages
+        }
+    }
+    broker_ref.update(topic_dict)

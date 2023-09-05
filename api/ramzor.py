@@ -4,7 +4,8 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QPushButton,
 from PyQt5.QtGui import QPainter, QColor, QFont
 from PyQt5.QtCore import Qt
 import requests
-
+import datetime
+from DB import fire as db
 
 apilink = "localhost"
 portnum = "8002"
@@ -60,7 +61,7 @@ class CrossroadStateModifier(QMainWindow):
         central_widget.setLayout(layout)
 
         # MQTT Initialization
-        self.mqtt_client = mqtt.Client("Smartersection")
+        self.mqtt_client = mqtt.Client()
         self.mqtt_client.on_connect = self.on_connect
         self.mqtt_client.on_message = self.on_message
         self.mqtt_client.connect("localhost", 1883, 60)
@@ -95,12 +96,15 @@ class CrossroadStateModifier(QMainWindow):
             requests.put(url=f"{url}crossroads/{crossroad_name}")
             self.circle_widget.color = QColor(Qt.red)
             # Publish a message when the state changes
-            self.mqtt_client.publish("your_topic", "Red")
+            db.updateBrokerDB(crossroad_name,"Publishing from Green to Red")
+            self.mqtt_client.publish(crossroad_name, "Red")
+
         else:
             self.circle_widget.color = QColor(Qt.green)
             requests.put(url=f"{url}crossroads/{crossroad_name}")
             # Publish a message when the state changes
-            self.mqtt_client.publish("your_topic", "Green")
+            db.updateBrokerDB(crossroad_name,"Publishing from Red to Green")
+            self.mqtt_client.publish(crossroad_name, "Green")
             
         
         

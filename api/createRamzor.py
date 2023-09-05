@@ -5,6 +5,7 @@ from PyQt5.QtGui import QPainter, QColor, QFont
 from PyQt5.QtCore import Qt
 import requests
 import json
+from DB import fire as db
 
 
 
@@ -63,15 +64,16 @@ class CrossroadStateModifier(QMainWindow):
             self.dragPos = newPos
 
     def create(self):
-        dict_body = {'name': self.name_bar.text(),'latitude':float(self.latitude_bar.text()),'longitude':float(self.longitude_bar.text()),'light':self.light_bar.text()}
+        name = self.name_bar.text()
+        dict_body = {'name': name,'latitude':float(self.latitude_bar.text()),'longitude':float(self.longitude_bar.text()),'light':self.light_bar.text()}
         print(json.dumps(dict_body))
         response = requests.post(url=url,json=dict_body, allow_redirects=False)
         try:
             response.raise_for_status()
+            db.updateBrokerDB(name, f"Created {name} ")
         except Exception as e:
             print(f"Error occurred: {e}")
             return
-
 
 
 

@@ -4,6 +4,7 @@ import uvicorn
 from DB import fire as db
 # import json
 
+
 app = FastAPI()
 
 class TrafficLight(BaseModel):
@@ -14,16 +15,6 @@ class TrafficLight(BaseModel):
 
 database = db
 crossroads = db.getAllCrossroads()
-
-
-
-# crossroads_1 = TrafficLight(latitude=40.7128, longitude=-74.0060, special_number="TL001", crossroad_name="Main Street")
-# crossroads_2 = TrafficLight(latitude=34.0522, longitude=-118.2437, special_number="TL002", crossroad_name="Broadway Avenue")
-
-# crossroads.update({crossroads_1.special_number: crossroads_1})
-# crossroads.update({crossroads_2.special_number: crossroads_2})
-
-
 
 @app.get("/crossroads/", response_model= dict)
 async def get_crossroads():
@@ -67,10 +58,11 @@ async def change_light(tl: str):
 
 @app.delete("/crossroads/{crossroads_name}")
 async def delete_crossroad(crossroads_name: str):
+    db.updateBrokerDB(crossroads_name, f"Deleted {crossroads_name} ")
     result = database.deleteCrossroad(crossroads_name)
     return {
         "status" : result,
     }
 
  
-uvicorn.run(app, host="0.0.0.0", port=8002)
+#uvicorn.run(app, host="0.0.0.0", port=8002)
