@@ -21,6 +21,7 @@ class CrossroadStateModifier(QMainWindow):
         self.light='Red'
         self.longitude= None
         self.latitude= None
+        self.cases = 0
 
     def initUI(self):
         self.setWindowTitle('Set Crossroad')
@@ -65,9 +66,10 @@ class CrossroadStateModifier(QMainWindow):
 
     def create(self):
         name = self.name_bar.text()
-        dict_body = {'name': name,'latitude':float(self.latitude_bar.text()),'longitude':float(self.longitude_bar.text()),'light':self.light_bar.text()}
-        print(json.dumps(dict_body))
+        dict_body = {'name': name,'latitude':float(self.latitude_bar.text()),'longitude':float(self.longitude_bar.text()),'light':self.light_bar.text(),'cases': int(self.cases)}
         response = requests.post(url=url,json=dict_body, allow_redirects=False)
+        print(json.dumps(dict_body))
+        print(url)
         try:
             response.raise_for_status()
             db.updateBrokerDB(name, f"Created {name} ")

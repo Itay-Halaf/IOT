@@ -11,3 +11,4 @@ car/
 server/
 traffic-light/
 test/
+__pycache__/
