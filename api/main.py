@@ -54,6 +54,7 @@ async def post_crossroad(tl: dict):
 @app.put("/crossroads/{tl}")
 async def change_light(tl: str):
         return database.changeCrossroadLight(tl)
+        
 
 
 @app.delete("/crossroads/{crossroads_name}")
@@ -65,4 +66,4 @@ async def delete_crossroad(crossroads_name: str):
     }
 
  
-#uvicorn.run(app, host="0.0.0.0", port=8002)
+uvicorn.run(app, host="0.0.0.0", port=8002)
