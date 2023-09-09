@@ -6,6 +6,7 @@ export interface MapProperties extends BaseProperties {
   onClick?: MouseEventHandler<HTMLButtonElement>;
   children: { name: string; position: LatLngLiteral }[];
   mapLocation: LatLngLiteral;
+  snackbarPopState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
 }
 
 export const Car = (deg: number) =>
@@ -17,5 +18,5 @@ export const Car = (deg: number) =>
 
 export const Dot = (color: string) =>
     <svg version="1.1" color={color} xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 256 256">
-      <circle style={{zIndex: '300 !important'}}  cx="50" cy="40" r="40" strokeWidth="10px" stroke="blue" fill="currentcolor"></circle>
+      <circle style={{zIndex: '300 !important'}}  cx="50" cy="40" r="40" strokeWidth="5px" stroke="lightgray" fill="currentcolor"></circle>
     </svg>

@@ -29,6 +29,7 @@ const LeafMap = (props: MapProperties) => {
   ));
 
   const carRef = useRef<L.SVGOverlay>(null);
+  const [snackbarPop, setSnackbarPop] = props.snackbarPopState;
 
   const carSize = 0.0001;
   const carRotation = -90;
@@ -45,6 +46,7 @@ const LeafMap = (props: MapProperties) => {
   });
 
   const [carSteps, setCarSteps] = useState<LatLng[]>([]);
+  const [isRed, setIsRed] = useState('Green');
   const [currCarStep, setCurrCarStep] = useState(0);
   const [startDrive, setStartDrive] = useState(false);
 
@@ -56,9 +58,24 @@ const LeafMap = (props: MapProperties) => {
   const subStepsNumber = 1850 * 100;
   const subStep = 1 / subStepsNumber;
 
+  const intersectionBounds = [
+    [
+      props.mapLocation.lat + carSize * 2,
+      props.mapLocation.lng + carSize * 2,
+    ],
+    [
+      props.mapLocation.lat - carSize * 2,
+      props.mapLocation.lng - carSize * 2,
+    ],
+  ] as LatLngBoundsLiteral;
+
   useEffect(() => {
     socketService.connect = () => alert("connected");
-    socketService.onMessage = e => console.log(e);
+    socketService.onMessage = e => {
+      console.log(e);
+      
+      setIsRed(e.toString())
+    };
   }, []);
 
   useEffect(() => {
@@ -83,10 +100,11 @@ const LeafMap = (props: MapProperties) => {
     let i = 0;
     let latSign = carPosition.curr.lat - carPosition.prev.lat >= 0 ? 1 : -1;
     let lngSign = carPosition.curr.lng - carPosition.prev.lng >= 0 ? 1 : -1;
+    const interlng = 34.775178;
 
     while (
       (diffLat + latSign * carPosition.prev.lat) <= carPosition.curr.lat &&
-      normalizedLat
+      normalizedLat && ((isRed === 'Green') || ((isRed === 'Red') && interlng <  diffLng + carPosition.prev.lng) || (!isRed))
     ) {
       i++;
       latSign = carPosition.curr.lat - carPosition.prev.lat >= 0 ? 1 : -1;
@@ -116,6 +134,12 @@ const LeafMap = (props: MapProperties) => {
           setCurrCarStep((c) => c + 1);
         }
       }, 10 * i);
+    }
+
+    const stopped = (isRed === 'Red') && interlng <  diffLng + carPosition.prev.lng;
+
+    if (stopped) {
+      setSnackbarPop(true);
     }
   }, [carPosition]);
 
@@ -157,7 +181,13 @@ const LeafMap = (props: MapProperties) => {
           >
             {Dot("green")}
           </SVGOverlay>
-          <RoutingMachine setCarSteps={setCarSteps} />
+          <SVGOverlay
+            attributes={{ stroke: "red" }}
+            bounds={intersectionBounds}
+          >
+            {Dot(isRed === 'Red' ? '#ff000060' : '#00ff0060')}
+          </SVGOverlay>
+          <RoutingMachine mapLocation={props.mapLocation} setCarSteps={setCarSteps} />
         </MapContainer>
       </div>
       <Button onClick={() => setStartDrive(!startDrive)}>
@@ -200,9 +230,22 @@ const createRoutineMachineLayer = (props: any) => {
       coord.map((c) => c.lat).filter(distinct),
       coord.map((c) => c.lng).filter(distinct),
     ];
-    props.setCarSteps(
-      points[0].map((p, i) => new LatLng(points[0][i], points[1][i]))
-    );
+    const newPoints = points[0].map((p, i, a) => {
+      return new LatLng(points[0][i], points[1][i]);
+    })
+
+    const finalPoints: LatLng[] = [];
+    const lng = 34.775195;
+    const lat = 32.013107;
+
+    newPoints.forEach((p, i, a) => {
+      finalPoints.push(p);
+      if (p.lat <= lat && p.lng >= lng && newPoints[i + 1].lng <= lng) {
+        finalPoints.push(new LatLng(lat, lng));
+      }
+    })
+
+    props.setCarSteps(finalPoints);
   });
 
   return instance;

@@ -10,12 +10,14 @@ import { Footer } from "./Components/Footer/footer.component";
 import { intersectionService } from "./Services/intersections.service";
 import { useMapEvents } from "react-leaflet";
 import { LatLng, LatLngLiteral } from "leaflet";
+import { Snackbar } from "./Components/Controls/Snackbar/snackbar.component";
 
 function App() {
   const sideMenu = useSideMenuState();
   
   const intersections = intersectionService.getIntersections();
   const [mapLocation, setMapLocation] = useState<LatLngLiteral>(new LatLng(32.013035, 34.774986));
+  const [snackbarPop, setSnackbarPop] = useState<boolean>(false);
   
     const clickHandler = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, position: LatLngLiteral) => {
       setMapLocation(position);
@@ -35,6 +37,9 @@ function App() {
       <div className="App-body">
         <div className="header-block"></div>
         <div className="container">
+          <Snackbar snackbarPopState={[snackbarPop, setSnackbarPop]}>
+            <div className="content">Event has been registered for: HIT intersection.</div>
+          </Snackbar>
           <Card>
             <h5>Please choose an operating intersection</h5>
             <span>
@@ -48,7 +53,7 @@ function App() {
               <Card>{intersectionToggles}</Card>
             </div>
           </Card>
-          <LeafMap mapLocation={mapLocation}>{intersections}</LeafMap>
+          <LeafMap snackbarPopState={[snackbarPop, setSnackbarPop]} mapLocation={mapLocation}>{intersections}</LeafMap>
         </div>
         <div className="header-block"></div>
         <div className="header-block"></div>

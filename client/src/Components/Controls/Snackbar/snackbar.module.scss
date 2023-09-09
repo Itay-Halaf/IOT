@@ -1,0 +1,23 @@
+.snackbarContainer {
+    padding: 20px;
+    border: 1px solid #00000040;
+    box-shadow: 5px 5px 5px #00000020;
+    border-radius: 10px;
+    height: 70px;
+    text-align: start;
+    position: fixed;
+    top: 20px;
+    right: -600px;
+    z-index: 9999;
+    background-color: #000022;
+    transition:1s cubic-bezier(0.6, -0.28, 0.735, 0.045);
+}
+
+.snackbarContent {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 100%;
+}

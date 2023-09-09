@@ -1,3 +1,4 @@
+import asyncio
 import sys
 import paho.mqtt.client as mqtt
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QPushButton, QLineEdit, QLabel, QWidget
@@ -6,12 +7,13 @@ from PyQt5.QtCore import Qt
 import requests
 import datetime
 from DB import fire as db
+from asyncqt import QEventLoop, asyncSlot, asyncClose
 
 apilink = "localhost"
 portnum = "8002"
 url = f"http://{apilink}:{portnum}/"
 
-crossroad_name = "TrafficLight"
+crossroad_name = ""
 
 color_dict = {"Red": Qt.red, "Green": Qt.green}
 
@@ -89,24 +91,32 @@ class CrossroadStateModifier(QMainWindow):
             self.move(self.pos() + diff)
             self.dragPos = newPos
 
-    def changeColor(self, light=""):
+    @asyncSlot()
+    async def changeColor(self, light=""):
+            
+        async def change_light():
+            requests.put(url=f"{url}crossroads/{crossroad_name}")
+            
+        async def color_circle(color):
+            self.circle_widget.color = QColor(color)
+        
+        loop = asyncio.get_running_loop()
+
         if light:
             self.circle_widget.color = QColor(color_dict[light])
         elif self.circle_widget.color == QColor(Qt.green):
-            requests.put(url=f"{url}crossroads/{crossroad_name}")
-            self.circle_widget.color = QColor(Qt.red)
+            await color_circle(Qt.red)
+            loop.create_task(change_light())
+            self.mqtt_client.publish("crossroads", "Red")
             # Publish a message when the state changes
             db.updateBrokerDB(crossroad_name,"Publishing from Green to Red")
-            self.mqtt_client.publish(crossroad_name, "Red")
 
         else:
-            self.circle_widget.color = QColor(Qt.green)
-            requests.put(url=f"{url}crossroads/{crossroad_name}")
+            self.mqtt_client.publish("crossroads", "Green")
+            await color_circle(Qt.green)
+            loop.create_task(change_light())
             # Publish a message when the state changes
             db.updateBrokerDB(crossroad_name,"Publishing from Red to Green")
-            self.mqtt_client.publish(crossroad_name, "Green")
-            
-        
         
     
         self.circle_widget.update()
@@ -129,6 +139,8 @@ class CrossroadStateModifier(QMainWindow):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    loop = QEventLoop(app)
+    asyncio.set_event_loop(loop)
     window = CrossroadStateModifier()
     window.show()
     sys.exit(app.exec_())
