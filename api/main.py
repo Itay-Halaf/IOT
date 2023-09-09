@@ -2,10 +2,24 @@ from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 import uvicorn
 from DB import fire as db
+from fastapi.middleware.cors import CORSMiddleware
+
 # import json
 
 
 app = FastAPI()
+
+origins = [
+    "*"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class TrafficLight(BaseModel):
     latitude: float
@@ -54,7 +68,6 @@ async def post_crossroad(tl: dict):
 
 @app.put("/crossroads/{tl}")
 async def change_light(tl: str):
-        database.addCaseNumber(tl)
         return database.changeCrossroadLight(tl)
         
 

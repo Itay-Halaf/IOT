@@ -12,7 +12,10 @@ const Snackbar = (props: SnackbarProperties) => {
 
   useEffect(() => {
     setTimeout(() => {
-      if (snackbarPop) setSnackbarPop(false);
+      if (snackbarPop) {
+        setSnackbarPop(false);
+        fetch("http://localhost:8002/crossroads/cases/HIT", { method: "PUT" });
+      }
     }, 2000);
   }, [snackbarPop, setSnackbarPop]);
 
